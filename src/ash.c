@@ -1,46 +1,48 @@
+// Currently loosely following "github.com/tokenrove/build-your-own-shell"
+
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
+#include <string.h>
 #include <unistd.h>
 
-char *PATH = "/usr/bin";
+#define RED "\x1b[31m"
+#define GREEN "\x1b[32m"
+#define YELLOW "\x1b[33m"
+#define BLUE "\x1b[34m"
+#define MAGENTA "\x1b[35m"
+#define CYAN "\x1b[36m"
+#define NOCOLOR "\x1b[0m"
 
-void printPrompt() {
-    char *promptStr = "[ash]%: ";
-    printf("%s", promptStr);
-}
+char **parseLine(char *line) {
+    char **tokenv = malloc(sizeof(char *) * ARG_MAX);
+    size_t tokenc = 0;
 
-void getInput() {
-    char *input = NULL;
-    size_t len; // idk what this does
+    char *tkn = NULL;
+    tkn = strtok(line, " \n");
+    if (tkn == NULL)
+        return tokenv;
+    tokenv[tokenc++] = tkn;
 
-    getline(&input, &len, stdin);
-
-    free(input);
-}
-
-void executeProgram() {
-    // TODO: check if program is in PATH
-
-    // TODO: handle fork failing
-    if (fork()) {
-        // parent
-        // waits for child to finish
-        // (waits for something in the pipe)
-        // print the output of child
-    } else {
-        // child
-        // execute the program
+    while ((tkn = strtok(NULL, " \n"))) {
+        tokenv[tokenc++] = tkn;
     }
-    // fork
-    // program runs, pipes the output back to parent
-    // parent prints output
+
+    return tokenv;
 }
 
 int main(int argc, char *argv[]) {
     while (1) {
-        printPrompt();
-        getInput();
-        executeProgram();
+        // print the prompt
+        printf("%s", "[ash]%: ");
+        fflush(stdout);
+
+        // read input
+        char *line = NULL;
+        size_t lineSize = 0;
+
+        getline(&line, &lineSize, stdin);
+        int tokenc = 3;
+        char **tokenv = parseLine(line);
     }
 }

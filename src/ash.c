@@ -6,29 +6,23 @@
 #include <string.h>
 #include <unistd.h>
 
-#define RED "\x1b[31m"
-#define GREEN "\x1b[32m"
-#define YELLOW "\x1b[33m"
-#define BLUE "\x1b[34m"
-#define MAGENTA "\x1b[35m"
-#define CYAN "\x1b[36m"
-#define NOCOLOR "\x1b[0m"
-
-char **parseLine(char *line) {
-    char **tokenv = malloc(sizeof(char *) * ARG_MAX);
-    size_t tokenc = 0;
+// parses line into an array of strings. Does in fact malloc.
+void parseLine(char *line, char **tokenv, int *tokenc) {
+    *tokenc = 0;
 
     char *tkn = NULL;
     tkn = strtok(line, " \n");
     if (tkn == NULL)
-        return tokenv;
-    tokenv[tokenc++] = tkn;
+        return;
 
-    while ((tkn = strtok(NULL, " \n"))) {
-        tokenv[tokenc++] = tkn;
+    tokenv[*tokenc] = strdup(tkn);
+    (*tokenc)++;
+
+    while (tkn) {
+        tokenv[*tokenc] = strdup(tkn);
+        (*tokenc)++;
+        tkn = strtok(NULL, " \n");
     }
-
-    return tokenv;
 }
 
 int main(int argc, char *argv[]) {
@@ -42,7 +36,14 @@ int main(int argc, char *argv[]) {
         size_t lineSize = 0;
 
         getline(&line, &lineSize, stdin);
-        int tokenc = 3;
-        char **tokenv = parseLine(line);
+
+        char **tokenv = malloc(ARG_MAX * sizeof(char *));
+        int tokenc;
+        parseLine(line, tokenv, &tokenc);
+        printf("c:%d\n", tokenc);
+
+        for (int i = 0; i < tokenc; i++) {
+            printf("[%d] %s\n", i, tokenv[i]);
+        }
     }
 }

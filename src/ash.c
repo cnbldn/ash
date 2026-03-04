@@ -1,4 +1,5 @@
 // Currently loosely following "github.com/tokenrove/build-your-own-shell"
+#define DEBUG 1
 
 #include <linux/limits.h>
 #include <stdio.h>
@@ -12,12 +13,6 @@ void parseLine(char *line, char **tokenv, int *tokenc) {
 
     char *tkn = NULL;
     tkn = strtok(line, " \n");
-    if (tkn == NULL)
-        return;
-
-    tokenv[*tokenc] = strdup(tkn);
-    (*tokenc)++;
-
     while (tkn) {
         tokenv[*tokenc] = strdup(tkn);
         (*tokenc)++;
@@ -39,11 +34,19 @@ int main(int argc, char *argv[]) {
 
         char **tokenv = malloc(ARG_MAX * sizeof(char *));
         int tokenc;
-        parseLine(line, tokenv, &tokenc);
-        printf("c:%d\n", tokenc);
 
+        parseLine(line, tokenv, &tokenc);
+        // exec line
+
+#if DEBUG
+        printf("c:%d\n", tokenc);
         for (int i = 0; i < tokenc; i++) {
             printf("[%d] %s\n", i, tokenv[i]);
+        }
+#endif /* if DEBUG */
+
+        for (int i = 0; i < tokenc; i++) {
+            free(tokenv[i]);
         }
     }
 }

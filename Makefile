@@ -1,8 +1,3 @@
-default:
-	gcc src/ash.c -o ash
+all:
+	gcc src/ash.c -o build/ash -g
 
-run:
-	gcc src/ash.c -o ash && ./ash
-
-debug:
-	gcc src/ash.c -g -o ashdebug
